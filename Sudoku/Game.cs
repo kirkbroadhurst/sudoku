@@ -4,5 +4,6 @@ namespace Sudoku
 {
     public class Game
     {
+
     }
 }
