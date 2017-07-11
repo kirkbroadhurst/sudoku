@@ -19,10 +19,10 @@ namespace Sudoku
                     this.Squares.Add(new Square(i, j), 0);
         }
 
-        public static ICollection<int> Gaps(ICollection<int> set)
+        public static ICollection<int> Gaps(IEnumerable<int> items)
         {
             var result = new HashSet<int>(values);
-            result.ExceptWith(set);
+            result.ExceptWith(items);
             return result;
         }
 
@@ -68,6 +68,11 @@ namespace Sudoku
         public IEnumerable<int> GetItems(List<Square> positions)
         {
             return positions.Select(p => this.Squares[p]);
+        }
+
+        public MoveSet GetMoves(List<Square> positions)
+        {
+            return new MoveSet(positions.Select(p => new Tuple<Square, int>(p, this.Squares[p])));
         }
     }
 }
