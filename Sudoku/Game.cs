@@ -8,9 +8,14 @@ namespace Sudoku
     public class Game
     {
         private static readonly HashSet<int> values = new HashSet<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        private Func<List<List<Square>>, IEnumerable<MoveSet>> lookup;
         private List<List<Square>> rows;
         private List<List<Square>> columns;
+        private List<List<Square>> boxes;
 
+        /// <summary>
+        /// The 'board' data structure
+        /// </summary>
         public Dictionary<Square, int> Squares { get; set; }
 
         public Game()
@@ -19,6 +24,9 @@ namespace Sudoku
             for (int i = 0; i < 9; i++)
                 for (int j = 0; j < 9; j++)
                     this.Squares.Add(new Square(i, j), 0);
+
+            this.BuildSquares();
+            this.lookup = set => set.Select(row => new MoveSet(row.Select(item => new Tuple<Square, int>(item, this.Squares[item]))));
         }
 
         public static ICollection<int> Gaps(IEnumerable<int> items)
@@ -26,19 +34,46 @@ namespace Sudoku
             var result = new HashSet<int>(values);
             result.ExceptWith(items);
             return result;
+        }        
+
+        public IEnumerable<MoveSet> Rows
+        {
+            get
+            {
+                return this.lookup(this.rows);
+            }
         }
 
-        public List<List<Square>> Rows { get; private set; }
-
-        public List<List<Square>> Columns { get; private set; }
+        public IEnumerable<MoveSet> Columns
+        {
+            get
+            {
+                return this.lookup(this.columns);
+            }
+        }
         
-        public List<List<Square>> Boxes { get; private set; }
+        public IEnumerable<MoveSet> Boxes
+        {
+            get
+            {
+                return this.lookup(this.boxes);
+            }
+        }
+
+        public IEnumerable<MoveSet> MoveSets
+        {
+            get
+            {
+                return this.Rows.Union(this.Columns).Union(this.Boxes);
+            }
+        }
+
 
         private void BuildSquares()
         {
-            this.Rows = new List<List<Square>>();
-            this.Columns = new List<List<Square>>();
-            this.Boxes = new List<List<Square>>();
+            this.rows = new List<List<Square>>();
+            this.columns = new List<List<Square>>();
+            this.boxes = new List<List<Square>>();
 
             for (int i = 0; i < 9; i++)
             {
@@ -49,8 +84,8 @@ namespace Sudoku
                     row.Add(new Square(i, j));
                     column.Add(new Square(j, i));
                 }
-                Rows.Add(row);
-                Columns.Add(column);
+                this.rows.Add(row);
+                this.columns.Add(column);
             }
 
             for (int i = 0; i < 9; i+= 3)
@@ -59,7 +94,7 @@ namespace Sudoku
                     var xx = Enumerable.Range(0, 3);
                     var yy = Enumerable.Range(0, 3);
                     var box = new List<Square>(xx.SelectMany(y => yy.Select(x => new Square(x + i, y + j))));
-                    this.Boxes.Add(box);
+                    this.boxes.Add(box);
                 }
         }
 
@@ -84,6 +119,11 @@ namespace Sudoku
             }
         }
 
+        public void PutPiece(Tuple<Square, int> move)
+        {
+            this.PutPiece(move.Item1.Item1, move.Item1.Item2, move.Item2);
+        }
+
         public void PutPiece(int x, int y, int value)
         {
             this.Squares[new Square(x, y)] = value;
@@ -97,6 +137,16 @@ namespace Sudoku
         public MoveSet GetMoves(List<Square> positions)
         {
             return new MoveSet(positions.Select(p => new Tuple<Square, int>(p, this.Squares[p])));
+        }
+
+        public bool IsFinished()
+        {
+            foreach (var set in this.MoveSets)
+            {
+                if (Game.Gaps(set.Values).Any())
+                    return false;
+            }
+            return true;
         }
     }
 }

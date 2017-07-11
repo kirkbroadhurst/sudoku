@@ -6,16 +6,10 @@ namespace Sudoku
 {
     public class Player
     {
-        public Game Game { get; set; }
-
         public Player()
         {
         }
  
-        public Player (Game game)
-        {
-        }
-
         public void FindPossibleMoves()
         {
 
@@ -28,7 +22,7 @@ namespace Sudoku
         /// <param name="squares"></param>
         /// <param name="result"></param>
         /// <returns>True if the row was solved</returns>
-        public bool SolveRow(MoveSet knownValues, out MoveSet moves)
+        public bool SolveMoveSet(MoveSet knownValues, out MoveSet moves)
         {
             moves = new MoveSet();
             var missingVals = Game.Gaps(knownValues.Select(v => v.Item2));
@@ -43,6 +37,28 @@ namespace Sudoku
             }
 
             return false;
+        }
+
+        public void SolveEasyRows(Game game)
+        {
+            bool found = true;
+            while (found)
+            {
+                found = false;
+                foreach (var row in game.MoveSets)
+                {
+                    MoveSet moves;
+                    this.SolveMoveSet(row, out moves);
+                    if (moves.Any())
+                        found = true;
+
+                    foreach (var move in moves)
+                    {
+                        game.PutPiece(move.Item1.Item1, move.Item1.Item2, move.Item2);
+                    }
+
+                }
+            }
         }
     }
 }

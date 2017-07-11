@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Sudoku;
@@ -13,10 +14,10 @@ namespace Sudoku.Test
         public void GameConstructorTest()
         {
             var game = new Game(); 
-            Assert.AreEqual(game.Squares.Count, 81);
+            Assert.AreEqual(81, game.Squares.Count);
             for (int i = 0; i < 9; i++)
                 for (int j = 0; j < 9; j++)               
-                    Assert.AreEqual(game.Squares[new Square(i, j)], 0);
+                    Assert.AreEqual(0, game.Squares[new Square(i, j)]);
         }
 
         [TestMethod]
@@ -51,8 +52,8 @@ namespace Sudoku.Test
             var game = new Game();
             game.LoadGame(file);
 
-            var row = game.GetItems(Game.GetRows()[0]);
-            Assert.AreEqual(row.GetEnumerator().Current, 0);
+            var row = game.Rows.First();
+            Assert.AreEqual(0, row[0].Item2);
         }
 
     }

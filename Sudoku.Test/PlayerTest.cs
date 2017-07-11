@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Sudoku;
@@ -17,11 +19,11 @@ namespace Sudoku.Test
             var game = new Game();
             game.LoadGame(file);
 
-            var row = game.GetMoves(Game.GetRows()[0]);
+            var row = game.Rows.First();
 
-            var player = new Player(game);
+            var player = new Player();
             var moves = new MoveSet();
-            var result = player.SolveRow(row, out moves);
+            var result = player.SolveMoveSet(row, out moves);
 
             Assert.IsTrue(result);
             Assert.AreEqual(moves.Count, 1);
@@ -29,5 +31,20 @@ namespace Sudoku.Test
             Assert.AreEqual(moves[0].Item2, 4);
         }
 
+        [TestMethod]
+        public void SolveGameTest()
+        {
+            foreach (var file in Directory.GetFiles("TestFiles"))
+            {
+
+                //var file = System.IO.Path.Combine("TestFiles", "001.txt");
+                var game = new Game();
+                game.LoadGame(file);
+
+                var player = new Player();
+                player.SolveEasyRows(game);
+                Assert.IsTrue(game.IsFinished());
+            }
+        }
     }
 }
