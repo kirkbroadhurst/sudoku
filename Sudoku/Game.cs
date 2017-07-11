@@ -8,6 +8,8 @@ namespace Sudoku
     public class Game
     {
         private static readonly HashSet<int> values = new HashSet<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        private List<List<Square>> rows;
+        private List<List<Square>> columns;
 
         public Dictionary<Square, int> Squares { get; set; }
 
@@ -26,17 +28,39 @@ namespace Sudoku
             return result;
         }
 
-        public static List<List<Square>> GetRows()
+        public List<List<Square>> Rows { get; private set; }
+
+        public List<List<Square>> Columns { get; private set; }
+        
+        public List<List<Square>> Boxes { get; private set; }
+
+        private void BuildSquares()
         {
-            var result = new List<List<Square>>();
+            this.Rows = new List<List<Square>>();
+            this.Columns = new List<List<Square>>();
+            this.Boxes = new List<List<Square>>();
+
             for (int i = 0; i < 9; i++)
             {
                 var row = new List<Square>();
+                var column = new List<Square>();
                 for (int j = 0; j < 9; j++)
+                {
                     row.Add(new Square(i, j));
-                result.Add(row);
+                    column.Add(new Square(j, i));
+                }
+                Rows.Add(row);
+                Columns.Add(column);
             }
-            return result;
+
+            for (int i = 0; i < 9; i+= 3)
+                for (int j = 0; j < 9; j+= 3)
+                {
+                    var xx = Enumerable.Range(0, 3);
+                    var yy = Enumerable.Range(0, 3);
+                    var box = new List<Square>(xx.SelectMany(y => yy.Select(x => new Square(x + i, y + j))));
+                    this.Boxes.Add(box);
+                }
         }
 
         /// <summary>
@@ -76,3 +100,4 @@ namespace Sudoku
         }
     }
 }
+
