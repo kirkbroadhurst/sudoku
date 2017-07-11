@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Sudoku;
 
-namespace UnitTestProject1
+namespace Sudoku.Test
 {
     [TestClass]
     public class GapsTest
