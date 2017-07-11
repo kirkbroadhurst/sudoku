@@ -44,5 +44,16 @@ namespace Sudoku.Test
             Assert.IsTrue(colGaps.Count == 0);
         }
 
+        [TestMethod]
+        public void LoadGameTest()
+        {
+            var file = System.IO.Path.Combine("TestFiles", "001.txt");
+            var game = new Game();
+            game.LoadGame(file);
+
+            var row = game.GetItems(Game.GetRows()[0]);
+            Assert.AreEqual(row.GetEnumerator().Current, 0);
+        }
+
     }
 }

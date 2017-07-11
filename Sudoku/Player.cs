@@ -14,6 +14,11 @@ namespace Sudoku
         public Player (Game game)
         {
         }
+
+        public void FindPossibleMoves()
+        {
+
+        }
     }
 }
 
